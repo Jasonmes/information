@@ -2,88 +2,22 @@
 # -*- coding:utf-8 -*-
 # Jason Mess
 
-from flask import Flask, session
-from flask_sqlalchemy import SQLAlchemy
-from redis import StrictRedis
-from flask_wtf.csrf import CSRFProtect
-from flask_session import Session
-
-
-# 创建项目配置类
-class Config(object):
-    """
-    项目配置类
-    开启debug的模式
-    """
-    DEBUG = True
-
-    """
-    数据库链接配置
-    并且不跟踪数据库修改
-    """
-    SQLALCHEMY_DATABASE_URI = "mysql://root:cq@127.0.0.1:3306/imformation16"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    """
-    redis数据库配置信息
-    REDIS_NUM : 第几个数据库
-    """
-    REDIS_HOST = "127.0.0.1"
-    REDIS_PORT = 6379
-    REDIS_NUM = 6
-
-    """
-    设置加密字符串
-    
-    import os
-    os.urandom(48)
-    import base64
-    base64.b64encode(os.urandom(48))
-    """
-    SECRET_KEY = "EJxSi/538lWIb/Vk+ruFunGT/UHtGOzZ9sKwY15cuULGvfaGqisJaUf0/ZXmdwF7"
-
-    """
-    调整session存储位置 存储到redis
-    指明session存储到那种类型的数据库
-    """
-
-    SESSION_REDIS = StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_NUM)
-    """
-    session需要数据加密
-    设置不永久存储
-    默认存储的有效时长
-    """
-    SESSION_USE_SIGNER = True
-    SESSION_PERMANENT = False
-    PERMANENT_SESSION_LIFETIME = 86400
-
-
-app = Flask(__name__)
-"""
-2：注册配置信息到app对象
-"""
-app.config.from_object(Config)
+from flask import Flask, session, current_app
+from flask_script import Manager
+from info import create_app
+import logging
 
 """
-3：创建mysql数据库对象
+单一职责的原则：manage.py 仅仅作为项目启动文件
+整体业务逻辑都在info那里
 """
-db = SQLAlchemy(app)
+
 
 """
-4：创建redis数据库对象
+7: 创建manager管理类
 """
-redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT, db=Config.REDIS_NUM)
-
-"""
-5：开启csrf后端保护机制
-提取cookie中csrf_token和ajax请求头里面csrf_token进行验证操作
-"""
-csrf = CSRFProtect(app)
-
-"""
-6：创建session拓展类的对象
-"""
-Session(app)
+app = create_app("development")
+manager = Manager(app)
 
 
 @app.route('/')
@@ -99,6 +33,17 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    """
+    python manage.py runserver -h -p -d
+    """
+    logging.debug("debug的信息")
+    logging.info("info的信息")
+    logging.warning("debug的信息")
+    logging.error("errord的日志信息")
+    logging.critical("erro的日志信息")
+     
+    current_app.logger.info('使用current_app封装好的info的信息')
+
+    manager.run()
 
 
