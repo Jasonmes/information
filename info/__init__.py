@@ -10,6 +10,7 @@ from flask_session import Session
 from config import config_dict
 import logging
 from logging.handlers import RotatingFileHandler
+from info.modules.index import index_bp
 
 
 def create_log(config_name):
@@ -83,5 +84,10 @@ def create_app(config_name):
     6：创建session拓展类的对象
     """
     Session(app)
+
+    """
+    注册蓝图
+    """
+    app.register_blueprint(index_bp)
 
     return app
