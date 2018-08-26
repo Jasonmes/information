@@ -10,7 +10,21 @@ from flask_session import Session
 from config import config_dict
 import logging
 from logging.handlers import RotatingFileHandler
-from info.modules.index import index_bp
+import pymysql
+pymysql.install_as_MySQLdb()
+
+"""
+3：创建mysql数据库对象
+并暴露给外界调用
+当app没有值的时候，创建一个空的数据库对象
+"""
+db = SQLAlchemy()
+
+"""
+空数据库对象
+type : 用来声明redis_store以后要保存
+"""
+redis_store = None  # type : StrictRedis
 
 
 def create_log(config_name):
@@ -42,7 +56,6 @@ def create_log(config_name):
 
 
 def create_app(config_name):
-
     """
     记录日志
     """
@@ -64,11 +77,12 @@ def create_app(config_name):
     """
     3：创建mysql数据库对象
     """
-    db = SQLAlchemy(app)
+    db.init_app(app)
 
     """
     4：创建redis数据库对象
     """
+    global redis_store
     redis_store = StrictRedis(host=configClass
                               .REDIS_HOST, port=configClass
                               .REDIS_PORT, db=configClass
@@ -86,8 +100,10 @@ def create_app(config_name):
     Session(app)
 
     """
+    导入蓝图（延迟导入：解决循环导入文件）
     注册蓝图
     """
+    from info.modules.index import index_bp
     app.register_blueprint(index_bp)
 
     return app

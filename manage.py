@@ -4,7 +4,8 @@
 
 from flask import Flask, session, current_app
 from flask_script import Manager
-from info import create_app
+from info import create_app, db
+from flask_migrate import Migrate, MigrateCommand
 import logging
 
 """
@@ -12,12 +13,18 @@ import logging
 整体业务逻辑都在info那里
 """
 
-
 """
 7: 创建manager管理类
 """
 app = create_app("development")
 manager = Manager(app)
+
+"""
+初始化迁移对象
+将迁移命令添加到管理对象中
+"""
+Migrate(app, db)
+manager.add_command("db", MigrateCommand)
 
 
 @app.route('/')
@@ -41,9 +48,7 @@ if __name__ == '__main__':
     logging.warning("debug的信息")
     logging.error("errord的日志信息")
     logging.critical("erro的日志信息")
-     
-    current_app.logger.info('使用current_app封装好的info的信息')
+
+    # current_app.logger.info('使用current_app封装好的info的信息')
 
     manager.run()
-
-

@@ -9,8 +9,9 @@ from flask import Blueprint
 
 """
 创建蓝图对象
+url_prefix="/index"
 """
-index_bp = Blueprint("index", __name__, url_prefix="/index")
+index_bp = Blueprint("index", __name__)
 
 """
 切记：让index模块知道有views.py这个文件
