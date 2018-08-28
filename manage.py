@@ -12,7 +12,6 @@ import logging
 单一职责的原则：manage.py 仅仅作为项目启动文件
 整体业务逻辑都在info那里
 """
-
 """
 7: 创建manager管理类
 """

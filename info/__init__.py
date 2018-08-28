@@ -81,12 +81,13 @@ def create_app(config_name):
 
     """
     4：创建redis数据库对象
+    decode_responses=True 从redis获取的值是str类 
     """
     global redis_store
     redis_store = StrictRedis(host=configClass
                               .REDIS_HOST, port=configClass
                               .REDIS_PORT, db=configClass
-                              .REDIS_NUM)
+                              .REDIS_NUM, decode_responses=True)
 
     """
     5：开启csrf后端保护机制
@@ -105,5 +106,12 @@ def create_app(config_name):
     """
     from info.modules.index import index_bp
     app.register_blueprint(index_bp)
+
+    """
+    登录注册模块
+    """
+    from info.modules.passport import passport_bp
+    app.register_blueprint(passport_bp)
+
 
     return app
